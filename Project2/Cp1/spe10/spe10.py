@@ -9,8 +9,9 @@ class Spe10(object):
     # ------------------------------------------------------------------------------#
 
     def __init__(self, layers):
-        self.full_shape = (60, 220, 85)
-        self.full_physdims = (365.76, 670.56, 51.816)
+        self.full_shape = np.array([60, 220, 85])
+        self.full_physdims = np.array([365.76, 670.56, 51.816])
+        self.spacing = self.full_physdims / self.full_shape
 
         self.layers = np.sort(np.atleast_1d(layers))
 
