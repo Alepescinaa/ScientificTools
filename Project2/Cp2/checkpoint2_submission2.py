@@ -435,31 +435,6 @@ def high_perm_points(grid_points_fine, treshold):
 
   return selected_points
 
-"""## Perform upscaling and test functions"""
-
-# selected_layers = 65
-# folder_results = main_folder + "results/"
-
-# # Read the SPE10 grid
-# spe10 = Spe10(selected_layers)
-
-# # Read the permeability associated to the given layer(s)
-# perm_folder = spe10_folder + "/perm/"
-# spe10.read_perm(perm_folder)
-
-# # Read the permeability associated to the given layer(s) for coarse grid
-# sd_coarse, result = Checkpoint1_solution(selected_layers, [10,10], folder_results)
-# sd_intermediate, result_intermediate = Checkpoint1_solution(selected_layers, [20,20], folder_results)
-
-# # Define the function to evaluate that depends only on the position of the injection well
-
-# # CostFunctional = lambda x: solve_coarse(sd_coarse, x, result, grid_dim, export_folder=folder_results)
-
-# # CostFunctionalFine = lambda x: solve_fine(spe10, x, grid_dim, export_folder=folder_results)
-
-# # print(CostFunctional([231, 481]))
-# # print(CostFunctionalFine([231, 481]))
-
 """## Optimization"""
 
 def checkpoint2_solution(selected_layers, folder_results):
@@ -476,6 +451,7 @@ def checkpoint2_solution(selected_layers, folder_results):
   print()
   print('#-------------------------------------------------#')
   print()
+    
   sd_intermediate, result_intermediate = Checkpoint1_solution(selected_layers, [20,20], folder_results)
   print('Performed intermediate upscaling')
   print()
