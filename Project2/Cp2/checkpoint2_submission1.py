@@ -387,34 +387,6 @@ def solve_coarse(
     # Return the maximum pressure at the injection wells
     return np.max(p[index_iwells])
 
-"""## Perform upscaling and test functions"""
-
-# selected_layers = 60
-# folder_results = main_folder + "results/"
-
-# # Read the SPE10 grid
-# spe10 = Spe10(selected_layers)
-
-# # Read the permeability associated to the given layer(s)
-# perm_folder = spe10_folder + "/perm/"
-# spe10.read_perm(perm_folder)
-
-# if __name__ == '__main__':
-#     # Read the permeability associated to the given layer(s) for coarse grid
-#     sd_coarse, result = Checkpoint1_solution(selected_layers, folder_results)
-
-#     # Define the function to evaluate that depends only on the position of the injection well
-#     CostFunctional = lambda x: solve_coarse(
-#         sd_coarse, x, result, export_folder=folder_results
-#     )
-
-#     CostFunctionalFine = lambda x: solve_fine(
-#         spe10, x, export_folder=folder_results
-#     )
-
-#     # print(CostFunctional([231, 481]))
-#     # print(CostFunctionalFine([231, 481]))
-
 """## Optimization"""
 
 def checkpoint2_solution(selected_layers, folder_results):
@@ -448,13 +420,6 @@ def checkpoint2_solution(selected_layers, folder_results):
     print()
     loss_list = []
 
-
-    # define cost functional on coarse scale (note that it depends on the upscaling)
-    CostFunctional = lambda x: solve_coarse(sd_coarse, x, result, export_folder = folder_results)
-
-    # define cost functional on fine scale
-    CostFunctionalFine = lambda x: solve_fine(spe10, x, export_folder = folder_results)
-
     start = time.time()
     pool = multiprocessing.Pool(processes = multiprocessing.cpu_count())
     loss = pool.starmap_async(solve_coarse, [(sd_coarse, x, result, 1, 0, folder_results) for x in (grid_points)]).get()
@@ -462,12 +427,6 @@ def checkpoint2_solution(selected_layers, folder_results):
     pool.join()
     end = time.time()
     print(end - start)
-
-    #for k in tqdm(range(len(grid_points))):
-      #print(f'Iteration {k + 1} / {len(grid_points)}')
-      #loss = CostFunctional(grid_points[k])
-      #loss_list.append(loss)
-      #print()
 
     if selected_layers < 72:
       k = 2
@@ -511,18 +470,6 @@ def checkpoint2_solution(selected_layers, folder_results):
     end = time.time()
     print("Optimization time: ", end - start)
 
-    #for k in tqdm(range(len(grid_points_fine))):
-      #print(f'Iteration {k + 1} / {len(grid_points_fine)}')
-      #loss_fine = CostFunctionalFine(grid_points_fine[k])
-      #loss_list_fine.append(loss_fine)
-      #print()
-
-    #loss_fine = np.array(loss_list_fine)
-    # top_fine = np.argsort(loss_fine)[:10]
-    # top_xy_fine = grid_points_fine[top_fine].T
-
-    #return  top_xy, loss, top_xy_fine, loss_fine
-
     top_fine = np.argsort(loss_fine)[0]
     top_xy_fine = grid_points_fine[top_fine].T
 
@@ -547,24 +494,3 @@ if __name__ == '__main__':
     top_xy_fine = checkpoint2_solution(selected_layers, folder_results)
 
     print(top_xy_fine)
-    
-    # #Read the SPE10 grid
-    # spe10 = Spe10(selected_layers)
-
-    # # Read the permeability associated to the given layer
-    # perm_folder = spe10_folder + "/perm/"
-    # spe10.read_perm(perm_folder)
-    # perm_dict = spe10.perm_as_dict()
-    # perm = perm_dict["kxx"]
-    # perm_2d = np.log10(perm).reshape((220, 60))
-
-    # plt.figure(figsize = (12, 8))
-    # plt.imshow(perm_2d, extent = [0, 365, 670, 0])
-    # plt.plot(top_xy[0], top_xy[1], marker = '*', markersize = 10, linestyle = '', color = 'red', label = 'coarse')
-    # plt.plot(top_xy[0][0], top_xy[1][0], marker = '*', markersize = 10, linestyle = '', color = 'orange', label = 'coarse best')
-    # plt.plot(top_xy_fine[0], top_xy_fine[1], marker = '*', markersize = 10, linestyle = '', color = 'white', label = 'fine')
-    # plt.plot(top_xy_fine[0][0], top_xy_fine[1][0], marker = '*', markersize = 10, linestyle = '', color = 'yellow', label = 'fine best')
-    # plt.title(f'Layer {selected_layers}')
-    # plt.colorbar()
-    # plt.legend()
-    # plt.show()
