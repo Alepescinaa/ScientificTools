@@ -138,7 +138,7 @@ folder_results = main_folder + "results/"
 # print(end - start)
 
 
-import multiprocessing
+from pathos.multiprocessing import _ProcessPool as Pool
 
 #print(multiprocessing.cpu_count())
 
@@ -171,17 +171,12 @@ def Checkpoint1_solution(selected_layers, folder_results):
     kyy_up = np.zeros(spe10.sd.num_cells)
     kxx = np.zeros(spe10.sd.num_cells)
 
-    pool = multiprocessing.Pool(processes=multiprocessing.cpu_count())
-    result = pool.starmap_async(process_subdomain, [(sub_sd_id, sub_sd, perm_dict, folder_results, part, kxx_up, kxy_up, kyx_up, kyy_up) for sub_sd_id, sub_sd in enumerate(sub_sds)]).get()
-   
-
-    for sub_sd_id, kk in enumerate(result):
-        mask = part == sub_sd_id
-        sub_perm = {key: val[mask] for key, val in perm_dict.items()}
-        kxx[mask] = sub_perm["kxx"]
-        kxx_up[mask], kxy_up[mask], kyx_up[mask], kyy_up[mask] = kk
-        #print(f"Subdomain {sub_sd_id}: {kk}")
-
+   result = []
+    args = [(sub_sd_id, sub_sd, perm_dict, part) for sub_sd_id, sub_sd in enumerate(sub_sds)]
+    with Pool() as pool:
+        for kk, mask in pool.starmap(process_subdomain, args, chunksize = 2):
+            kxx_up[mask], kxy_up[mask], kyx_up[mask], kyy_up[mask] = kk
+            result.append(kk)
     var_to_save = [
         ("kxx", kxx_up),
         ("kxy", kxy_up),
