@@ -171,12 +171,13 @@ def Checkpoint1_solution(selected_layers, folder_results):
     kyy_up = np.zeros(spe10.sd.num_cells)
     kxx = np.zeros(spe10.sd.num_cells)
 
-   result = []
+    result = []
     args = [(sub_sd_id, sub_sd, perm_dict, part) for sub_sd_id, sub_sd in enumerate(sub_sds)]
     with Pool() as pool:
         for kk, mask in pool.starmap(process_subdomain, args, chunksize = 2):
             kxx_up[mask], kxy_up[mask], kyx_up[mask], kyy_up[mask] = kk
             result.append(kk)
+            
     var_to_save = [
         ("kxx", kxx_up),
         ("kxy", kxy_up),
